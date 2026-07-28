@@ -1,16 +1,7 @@
 """
-Carga, normalización y preprocesamiento del corpus de reseñas turísticas.
+Procesamiento del corpus con todas las reseñas
 
-Centralizado aquí (y NO repetido en cada script de bagOFwords.py/word2vec.py/beto.py)
-para garantizar que los tres análisis reciban EXACTAMENTE los mismos tokens de
-entrada -- si cada uno tokenizara por su cuenta, la comparación entre
-representaciones (Criterio 4) dejaría de ser un experimento controlado.
-
-El POS Tagging (NLTK Penn Treebank + spaCy Universal POS con lemas) ya viene
-calculado desde el Proyecto 1 en las columnas `penntreebank` y `universalpos`
-del CSV -- este módulo NO vuelve a etiquetar nada, solo parsea esas columnas
-(vienen como texto, ej. "[('La', 'DET', 'el'), ...]") y extrae los lemas
-útiles para alimentar los modelos.
+Proyecto 1 + Proyecto 2
 """
 
 import ast
@@ -19,10 +10,11 @@ import re
 import pandas as pd
 import nltk
 
-# Ruta por defecto del corpus. Cuando llegue el corpus ampliado por Web
-# Scraping, cambiar esta ruta (o concatenar ambos DataFrames en
-# cargar_y_preparar_corpus antes de tokenizar).
+
 CORPUS_PATH_DEFAULT = "data/processed/dataset_Google-Maps-Reviews-Scraper-postagging.csv"
+
+CORPUS_PATH_DEFAULT = "../../data/processed/corpus_final.csv"
+
 
 TEXT_COLUMN = "comentarios_espanol"  # texto ya traducido/limpio -- usar SIEMPRE este campo
 RATING_COLUMN = "calificacion"
@@ -58,10 +50,7 @@ def derive_polaridad(calificacion):
 
 
 def cargar_corpus(path: str = CORPUS_PATH_DEFAULT) -> pd.DataFrame:
-    """
-    Carga el CSV y agrega columnas derivadas: polaridad, pos_nltk, pos_spacy,
-    texto_valido. NO tokeniza todavía (ver `preparar_corpus` más abajo).
-    """
+
     df = pd.read_csv(path)
 
     columnas_requeridas = [TEXT_COLUMN, RATING_COLUMN, PLACE_TYPE_COLUMN]
@@ -83,9 +72,9 @@ def cargar_corpus(path: str = CORPUS_PATH_DEFAULT) -> pd.DataFrame:
     return df
 
 
-# ---------------------------------------------------------------------------
-# 2. Tokenización (reutilizando los lemas de spaCy ya calculados)
-# ---------------------------------------------------------------------------
+
+# Tokenización con los lemas de spaCy ya calculados
+
 try:
     from nltk.corpus import stopwords
     STOPWORDS_ES = set(stopwords.words("spanish"))
@@ -101,6 +90,7 @@ except LookupError:
 
 # Categorías gramaticales sin contenido semántico (se descartan para
 # Word2Vec/BoW; se conservan solo para análisis morfosintáctico)
+
 UPOS_DESCARTABLES = {"PUNCT", "SPACE", "SYM", "X"}
 
 # Stopwords de dominio adicionales a las de NLTK:
@@ -115,11 +105,7 @@ STOPWORDS_TOTAL = STOPWORDS_ES | STOPWORDS_DOMINIO
 
 
 def tokenizar_desde_pos_spacy(pos_spacy: list) -> list:
-    """
-    Extrae lemas semánticamente útiles desde la lista de tuplas
-    (token, upos, lema) ya calculada por spaCy en el Proyecto 1.
-    Filtra puntuación/símbolos y stopwords.
-    """
+
     if not pos_spacy:
         return []
 
@@ -140,11 +126,7 @@ def tokenizar_desde_pos_spacy(pos_spacy: list) -> list:
 
 
 def tokenizar_texto_plano(texto: str) -> list:
-    """
-    Fallback para textos SIN POS tags (ej. reseñas nuevas de scraping antes
-    de correr el pipeline de POS). Tokeniza con NLTK, minúsculas, sin
-    stopwords ni no-alfabéticos.
-    """
+
     if not isinstance(texto, str) or not texto.strip():
         return []
     tokens = nltk.word_tokenize(texto.lower(), language="spanish")
@@ -164,14 +146,10 @@ def tokenizar_corpus(df: pd.DataFrame, columna_texto: str = TEXT_COLUMN) -> pd.D
     return df
 
 
-# ---------------------------------------------------------------------------
-# 3. Función de conveniencia: todo en un solo llamado
-# ---------------------------------------------------------------------------
+# Función de conveniencia: todo en un solo llamado
+
 def cargar_y_preparar_corpus(path: str = CORPUS_PATH_DEFAULT) -> pd.DataFrame:
-    """
-    Punto de entrada único para bagOFwords.py, word2vec.py y beto.py:
-    carga el corpus, deriva polaridad, y tokeniza -- todo con la misma lógica.
-    """
+
     df = cargar_corpus(path)
     df = tokenizar_corpus(df)
     return df
