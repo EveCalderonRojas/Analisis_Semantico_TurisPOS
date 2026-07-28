@@ -1,0 +1,40 @@
+{
+  "polisemia": {
+    "palabra": "rico",
+    "similitud_intra_positivas": 0.9249781966209412,
+    "similitud_intra_negativas": 0.9238773584365845,
+    "similitud_entre_positiva_negativa": 0.7503716945648193
+  },
+  "mlm_ejemplos": [
+    {
+      "oracion": "El servicio del hotel fue [MASK].",
+      "predicciones": [
+        "gratuito",
+        "cancelado",
+        "limitado",
+        "suspendido",
+        "interrumpido"
+      ]
+    },
+    {
+      "oracion": "El sendero del parque estaba [MASK].",
+      "predicciones": [
+        "bloqueado",
+        "roto",
+        "cerrado",
+        "abierto",
+        "abandonado"
+      ]
+    },
+    {
+      "oracion": "La comida del restaurante es [MASK].",
+      "predicciones": [
+        "[UNK]",
+        "tradicional",
+        "excelente",
+        "típica",
+        "deliciosa"
+      ]
+    }
+  ]
+}
