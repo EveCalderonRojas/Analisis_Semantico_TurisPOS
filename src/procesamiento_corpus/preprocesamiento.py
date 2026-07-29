@@ -11,7 +11,7 @@ import pandas as pd
 import nltk
 
 
-CORPUS_PATH_DEFAULT = "data/processed/dataset_Google-Maps-Reviews-Scraper-postagging.csv"
+CORPUS_PATH_DEFAULT = "../../data/processed/corpus_final.csv"
 
 CORPUS_PATH_DEFAULT = "../../data/processed/corpus_final.csv"
 
