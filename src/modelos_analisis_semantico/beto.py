@@ -1,23 +1,7 @@
-"""
-BETO: embeddings contextuales (dccuchile/bert-base-spanish-wwm-cased).
-
-A diferencia de Word2Vec, BETO genera un vector DISTINTO para la misma
-palabra según el contexto de la oración (Criterio 3, 25 pts):
-  - Polisemia contextual (ej. "rico" en sabor vs. dinero)
-  - Búsqueda semántica de reseñas completas
-  - Masked Language Model
-
-Requiere descargar el modelo (~420MB) desde HuggingFace la primera vez
-que se ejecuta. Si tu máquina no puede correrlo, usá Google Colab
-(gratis, con GPU) y procesá en batches pequeños (100 reseñas por defecto)
-para no quedarte sin memoria.
-"""
 
 import numpy as np
 import torch
 from transformers import AutoTokenizer, AutoModel, AutoModelForMaskedLM
-
-from procesamiento_corpus.preprocesamiento import cargar_y_preparar_corpus
 
 MODEL_NAME = "dccuchile/bert-base-spanish-wwm-cased"
 
@@ -56,10 +40,7 @@ def cargar_beto_mlm():
 @torch.no_grad()
 def embeddings_de_textos(textos, modo="cls", batch_size=100, max_length=128):
     """
-    Genera embeddings de una lista de textos (reseñas completas, NO tokens).
-
-    modo="cls" -> vector del token [CLS] (estándar de BERT para clasificación)
-    modo="mean" -> promedio de todos los tokens (mejor para similitud de oraciones)
+    Genera embeddings de una lista de textos
     """
     tokenizer, modelo = cargar_beto()
     device = _device()
@@ -122,9 +103,7 @@ def embedding_de_palabra_en_contexto(palabra, oracion, modo="mean"):
 def analizar_polisemia(palabra, oraciones_positivas, oraciones_negativas):
     """
     Similitud coseno intra-grupo vs. entre-grupos del embedding contextual
-    de una palabra polisémica en oraciones positivas vs. negativas. Si BETO
-    capta bien el contexto, la similitud DENTRO de cada grupo debería ser
-    más alta que ENTRE grupos.
+    de una palabra polisémica en oraciones positivas vs. negativas
     """
     from sklearn.metrics.pairwise import cosine_similarity
 
@@ -181,24 +160,41 @@ def completar_mask(oracion_con_mask, top_n=5):
     return [tokenizer.decode([tid]).strip() for tid in top_ids]
 
 
-if __name__ == "__main__":
-    # Prueba mínima -- requiere descargar el modelo (~420MB) de HuggingFace.
-    # Corré este archivo en tu máquina o en Google Colab (no en el sandbox de Claude).
-    print(f"Cargando {MODEL_NAME} ...")
-    cargar_beto()
-    print("Modelo cargado correctamente.")
-
-    corpus = cargar_y_preparar_corpus()
-
-    ejemplo_pos = "La comida es muy rica, todo fresco y bien preparado."
-    ejemplo_neg = "El lugar es carísimo, solo apto para un turista rico."
-
-    print("\nEmbedding contextual de 'rico' en ambos contextos:")
-    v1 = embedding_de_palabra_en_contexto("rico", ejemplo_pos)
-    v2 = embedding_de_palabra_en_contexto("rico", ejemplo_neg)
+def matriz_similitud_documentos(embeddings_documentos):
+    """
+    Similitud coseno entre documentos a partir de una matriz de embeddings
+    """
     from sklearn.metrics.pairwise import cosine_similarity
-    print("Similitud coseno entre los dos usos de 'rico':", cosine_similarity([v1], [v2])[0][0])
 
-    print("\nCompletando máscara:")
-    tok = AutoTokenizer.from_pretrained(MODEL_NAME)
-    print(completar_mask(f"El servicio del hotel fue {tok.mask_token}."))
+    return cosine_similarity(embeddings_documentos)
+
+
+def extraer_oraciones_con_palabra(corpus, palabra, columna_texto="comentarios_espanol",
+                                   columna_polaridad="polaridad", max_oraciones=5, seed=42):
+    """
+    Busca oraciones REALES del corpus que contengan `palabra` (coincidencia
+    de palabra completa, sin importar mayúsculas/tildes de caja), separadas
+    por polaridad ("positiva"/"negativa"). Pensada para armar ejemplos de
+    polisemia contextual sin inventar oraciones a mano.
+
+    """
+    import random
+    import re
+
+    patron = re.compile(rf"\b{re.escape(palabra)}\b", re.IGNORECASE)
+    resultado = {}
+
+    for polaridad_objetivo in ("positiva", "negativa"):
+        sub_corpus = corpus[corpus[columna_polaridad] == polaridad_objetivo]
+        oraciones_encontradas = []
+
+        for texto in sub_corpus[columna_texto].dropna():
+            for oracion in re.split(r"(?<=[.!?])\s+", str(texto)):
+                oracion = oracion.strip()
+                if oracion and patron.search(oracion):
+                    oraciones_encontradas.append(oracion)
+
+        random.Random(seed).shuffle(oraciones_encontradas)
+        resultado[polaridad_objetivo] = oraciones_encontradas[:max_oraciones]
+
+    return resultado
