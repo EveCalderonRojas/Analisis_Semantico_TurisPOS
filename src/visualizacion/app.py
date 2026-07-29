@@ -1,4 +1,3 @@
-
 import dash
 from dash import Dash, html, dcc
 import dash_bootstrap_components as dbc
@@ -43,11 +42,10 @@ navbar = html.Nav(style={
         'textDecoration': 'none'
     }),
     html.Div(style={'display': 'flex', 'gap': '8px'}, children=[
-        dcc.Link('Inicio',   href='/',          style={'color': BLANCO, 'textDecoration': 'none', 'padding': '18px 20px', 'fontSize': '15px', 'letterSpacing': '0.5px'})
+        dcc.Link('Inicio',   href='/',              style={'color': BLANCO, 'textDecoration': 'none', 'padding': '18px 20px', 'fontSize': '15px', 'letterSpacing': '0.5px'}),
+        dcc.Link('Modelos',  href='/modelos',       style={'color': BLANCO, 'textDecoration': 'none', 'padding': '18px 20px', 'fontSize': '15px', 'letterSpacing': '0.5px'})
     ])
 ])
-
-
 
 # FOOTER
 footer = html.Footer(style={
@@ -59,9 +57,19 @@ footer = html.Footer(style={
     'fontFamily': 'Arial, sans-serif'
 }, children=[
     html.P('Minería de Datos — Análisis de Reseñas Turísticas Costa Rica', style={'margin': '0 0 6px'}),
-    html.P('Análisis Semantico', style={'margin': '0', 'color': VERDE_CLARO})
+    html.P('Análisis Semántico: BoW / TF-IDF, Word2Vec y BETO', style={'margin': '0', 'color': VERDE_CLARO})
 ])
 
+# LAYOUT ─
+app.layout = html.Div(
+    style={'fontFamily': 'Georgia, serif', 'backgroundColor': CREMA, 'margin': '0', 'padding': '0'},
+    children=[
+        navbar,
+        dash.page_container,
+        footer
+    ]
+)
 
-
-
+# EJECUCIÓN
+if __name__ == '__main__':
+    app.run(debug=True)
