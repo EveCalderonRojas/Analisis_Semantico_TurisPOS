@@ -11,8 +11,18 @@ Además de funciones de optimización ee código y explicaciones varias.
 
 ### 🧾 Ejemplos de prompts 
 
-Dentro de los prompts que le di para trabajar a Claude, la mayoría se trató de preguntas que tenía con respecto a organización, que me revisara los errores que me daba al momento de ejecución, y que me ayudara con la parte visual, como se muestra en estos dos siguientes:
+Dentro de los prompts que le di para trabajar a Claude, la mayoría se trató de preguntas que tenía con respecto a organización, que me revisara los errores que me daba al momento de ejecución, y que me ayudara con la parte visual, como se muestra en las siguientes imágenes:
 
+<img width="791" height="240" alt="Captura de pantalla 2026-07-30 125509" src="https://github.com/user-attachments/assets/d8c2f962-f889-424a-bf34-fca9d0c71343" />
+
+
+<img width="812" height="407" alt="Captura de pantalla 2026-07-30 125703" src="https://github.com/user-attachments/assets/3dfb8dbb-eec9-4e0d-8c17-54a958261518" />
+
+
+<img width="761" height="176" alt="Captura de pantalla 2026-07-30 125912" src="https://github.com/user-attachments/assets/db8c225c-70ef-4ff8-889a-76c8f2276cd1" />
+
+
+<img width="791" height="360" alt="Captura de pantalla 2026-07-30 125928" src="https://github.com/user-attachments/assets/2f69d77b-6625-4838-ad94-f77dc695aa47" />
 
 
 Ahí incluso le hice un pequeño 'boceto' de cómo quería que quedara la página para la parte de la sección de Modelos, ya que no quería que chocara todo y hubiese que estar con el scroll, mejor todo agrupado y en orden.
