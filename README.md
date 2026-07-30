@@ -28,9 +28,6 @@ Python:
 Claude como asistente de IA para entendimiento y optimización de código.
 
 
-Parte del código base del proyecto se extrajo del proyecto anterior de AnalisisSentimientosYT, el cual puede ser encontrado en el siguiente repositorio 👉🏻 https://github.com/EveCalderonRojas/AnalisisSentimientosYT
-
-
 Plotly Dash:
 - Parte visual del proyecto 
 - Presentación de resultados de métricas y gráficos.
